@@ -1,0 +1,1717 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FHIR-administration</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #172b3a;
+      background: #f3f6f8;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body { margin: 0; min-width: 320px; }
+
+    header {
+      padding: 28px max(24px, calc((100% - 1120px) / 2));
+      color: white;
+      background: #123b52;
+    }
+
+    header p { margin: 6px 0 0; color: #d3e2e9; }
+    h1 { margin: 0; font-size: 1.65rem; }
+    main { max-width: 1120px; margin: 28px auto; padding: 0 24px; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid #d5dfe5;
+    }
+
+    .tab {
+      padding: 12px 18px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      color: #496273;
+      background: transparent;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab[aria-selected="true"] { color: #126a78; border-bottom-color: #168391; }
+    .toolbar { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; }
+    .toolbar form { display: flex; gap: 8px; flex: 1; }
+    input, select, textarea {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid #c5d2d9;
+      border-radius: 5px;
+      color: inherit;
+      background: white;
+      font: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus { outline: 2px solid #7bc2c9; outline-offset: 1px; }
+    button.action {
+      min-height: 40px;
+      padding: 9px 14px;
+      border: 1px solid #c5d2d9;
+      border-radius: 5px;
+      color: #203d4e;
+      background: white;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button.action:hover { background: #edf4f6; }
+    button.primary { border-color: #126a78; color: white; background: #126a78; }
+    button.primary:hover { background: #0e5864; }
+    button.danger { color: #a52c2c; }
+    .hint { margin: 0 0 16px; color: #607786; font-size: .9rem; }
+
+    .notice {
+      margin: 14px 0;
+      padding: 12px 14px;
+      border-radius: 5px;
+      background: #e7f2f4;
+      color: #234c5a;
+    }
+
+    .notice.error { color: #842626; background: #fff0ef; }
+    .table-wrap { overflow-x: auto; border: 1px solid #d5dfe5; border-radius: 7px; background: white; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 13px 15px; border-bottom: 1px solid #e6ecef; vertical-align: middle; }
+    th { color: #496273; background: #f8fafb; font-size: .88rem; }
+    tbody tr:last-child td { border-bottom: 0; }
+    td.actions { text-align: right; white-space: nowrap; }
+    td.actions button { margin-left: 6px; }
+    .empty { padding: 32px; color: #607786; text-align: center; }
+    .contact-list { margin-top: 24px; }
+    .contact-list h2 { margin: 0 0 10px; font-size: 1.15rem; }
+    .organization-name { display: inline-block; padding-left: calc(var(--depth) * 22px); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    dialog {
+      width: min(560px, calc(100% - 28px));
+      max-height: 90vh;
+      padding: 0;
+      border: 0;
+      border-radius: 9px;
+      box-shadow: 0 16px 55px #102f3c45;
+    }
+
+    dialog::backdrop { background: #102f3c88; }
+    .dialog-header, .dialog-footer { padding: 18px 22px; }
+    .dialog-header { border-bottom: 1px solid #e2e9ed; }
+    .dialog-header h2 { margin: 0; font-size: 1.2rem; }
+    .dialog-body { display: grid; gap: 15px; max-height: 62vh; overflow-y: auto; padding: 20px 22px; }
+    .field { display: grid; gap: 6px; }
+    .field label { color: #385363; font-size: .9rem; font-weight: 600; }
+    .field small { color: #607786; }
+    .member-options { display: grid; gap: 8px; max-height: 220px; overflow-y: auto; padding: 12px; border: 1px solid #c5d2d9; border-radius: 5px; background: white; }
+    .member-option { display: flex; align-items: flex-start; gap: 9px; }
+    .member-option input { width: 18px; min-height: 18px; margin: 1px 0 0; }
+    textarea { min-height: 96px; resize: vertical; }
+    .checkbox { display: flex; align-items: center; gap: 9px; }
+    .checkbox input { width: 18px; min-height: 18px; }
+    .dialog-footer { display: flex; justify-content: flex-end; gap: 9px; border-top: 1px solid #e2e9ed; }
+
+    @media (max-width: 600px) {
+      header { padding: 22px 18px; }
+      main { margin: 18px auto; padding: 0 14px; }
+      .tab { flex: 1; padding: 11px 6px; font-size: .9rem; }
+      .toolbar { flex-wrap: wrap; }
+      .toolbar form { min-width: 100%; order: 2; }
+      .toolbar > button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FHIR-administration</h1>
+    <p>Hantera patienter, organisationer och fasta kontakter.</p>
+  </header>
+  <main>
+    <nav class="tabs" role="tablist" aria-label="Resurser">
+      <button class="tab" id="tab-patient" role="tab" aria-selected="true" aria-controls="panel">Patient</button>
+      <button class="tab" id="tab-organization" role="tab" aria-selected="false" aria-controls="panel">Organisation</button>
+      <button class="tab" id="tab-practitioner" role="tab" aria-selected="false" aria-controls="panel">Vårdpersonal</button>
+      <button class="tab" id="tab-contacts" role="tab" aria-selected="false" aria-controls="panel">Fast kontakt</button>
+      <button class="tab" id="tab-team" role="tab" aria-selected="false" aria-controls="panel">Team</button>
+      <button class="tab" id="tab-fhir-server" role="tab" aria-selected="false" aria-controls="panel">FHIR-server</button>
+    </nav>
+    <section id="panel" role="tabpanel" aria-labelledby="tab-patient">
+      <div id="resource-view">
+      <div class="toolbar">
+        <form id="search-form" role="search">
+          <input id="search-input" type="search" placeholder="Sök på namn" aria-label="Sök på namn">
+          <button class="action" type="submit">Sök</button>
+        </form>
+        <button class="action" id="refresh-button" type="button">Uppdatera</button>
+        <button class="action primary" id="create-button" type="button">+ Lägg till</button>
+      </div>
+      <p class="hint" id="resource-hint"></p>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div class="table-wrap" id="single-list">
+        <table>
+          <thead id="table-head"></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <div id="contact-lists" hidden>
+        <section class="contact-list" aria-labelledby="care-manager-heading">
+          <h2 id="care-manager-heading">Fasta kontakter</h2>
+          <div class="table-wrap">
+            <table>
+              <thead id="care-manager-head"></thead>
+              <tbody id="care-manager-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <div id="team-list" hidden>
+        <section class="contact-list" aria-labelledby="care-team-heading">
+          <h2 id="care-team-heading">Team</h2>
+          <div class="table-wrap">
+            <table>
+              <thead id="care-team-head"></thead>
+              <tbody id="care-team-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      </div>
+      <section id="server-settings" hidden aria-labelledby="server-settings-heading">
+        <h2 id="server-settings-heading">FHIR-server</h2>
+        <p class="hint">Ange FHIR-serverns bas-URL, till exempel <code>http://localhost:8080/fhir</code>.</p>
+        <form id="server-settings-form">
+          <div class="field">
+            <label for="fhir-base-url">Bas-URL</label>
+            <input id="fhir-base-url" name="fhir-base-url" type="url" required>
+          </div>
+          <p id="server-settings-status" class="notice" role="status" hidden></p>
+          <button class="action primary" type="submit">Spara bas-URL</button>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="resource-dialog" aria-labelledby="dialog-title">
+    <form id="resource-form">
+      <div class="dialog-header"><h2 id="dialog-title"></h2></div>
+      <div class="dialog-body" id="form-fields"></div>
+      <div class="dialog-footer">
+        <button class="action" id="cancel-button" type="button">Avbryt</button>
+        <button class="action primary" type="submit">Spara</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    "use strict";
+
+    const DEFAULT_FHIR_BASE_URL = "http://localhost:8080/fhir";
+    const FHIR_BASE_URL_STORAGE_KEY = "his-mock.fhir-base-url";
+    let FHIR_BASE_URL = localStorage.getItem(FHIR_BASE_URL_STORAGE_KEY) || DEFAULT_FHIR_BASE_URL;
+    const PERSONNUMMER_SYSTEM = "urn:oid:http://electronichealth.se/identifier/personnummer";
+    const CARE_MANAGER_ROLE_SYSTEM = "urn:oid:1.2.752.129.5.1.69";
+    const CARE_MANAGER_ROLE_CODES = [
+      ["1", "Fast vårdkontakt"],
+      ["2", "Fast läkarkontakt i primärvården"],
+      ["3", "Fast omsorgskontakt i hemtjänsten"],
+      ["4", "Fast vårdkontakt med övergripande samordningsansvar"]
+    ];
+    const resources = {
+      Patient: { label: "Patient", columns: ["Personnummer", "Namn", "Kön", "Födelsedatum"], search: "Patient" },
+      Organization: { label: "Organisation", columns: ["Namn", "Överordnad organisation", "Status", "ID"], search: "Organization" },
+      Practitioner: { label: "Vårdpersonal", columns: ["Namn", "Kön", "Telefon"], search: "Practitioner" },
+      CareTeam: { label: "Team", columns: ["Namn", "Status", "Patient"], search: "CareTeam" }
+    };
+
+    let activeTab = "Patient";
+    let visibleResources = [];
+    let organizationResources = [];
+    let patientChoices = [];
+    let practitionerRoleResources = [];
+    let practitionerResources = [];
+    let practitionerChoices = [];
+    let editingResource = null;
+    let editingPractitionerRoles = [];
+    let editingCareManagerRole = null;
+    let editingCareTeamRole = null;
+    const panel = document.getElementById("panel");
+    const notice = document.getElementById("notice");
+    const dialog = document.getElementById("resource-dialog");
+
+    function apiUrl(path) {
+      return `${FHIR_BASE_URL.replace(/\/$/, "")}/${path}`;
+    }
+
+    async function requestResponse(path, options = {}) {
+      const response = await fetch(apiUrl(path), {
+        ...options,
+        headers: { Accept: "application/fhir+json", ...(options.body ? { "Content-Type": "application/fhir+json" } : {}), ...options.headers }
+      });
+      if (!response.ok) {
+        const detail = await response.text();
+        throw new Error(`${response.status} ${response.statusText}${detail ? `: ${detail}` : ""}`);
+      }
+      return response;
+    }
+
+    async function request(path, options = {}) {
+      const response = await requestResponse(path, options);
+      if (response.status === 204) return null;
+      return response.json();
+    }
+
+    function showNotice(message, isError = false) {
+      notice.textContent = message;
+      notice.classList.toggle("error", isError);
+      notice.hidden = !message;
+    }
+
+    function normalizeFhirBaseUrl(value) {
+      let url;
+      try {
+        url = new URL(value.trim());
+      } catch {
+        throw new Error("Ange en giltig fullständig URL, inklusive http:// eller https://.");
+      }
+      if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || url.search || url.hash) {
+        throw new Error("Bas-URL:en måste använda HTTP eller HTTPS och får inte innehålla inloggningsuppgifter, frågeparametrar eller fragment.");
+      }
+      return url.toString().replace(/\/+$/, "");
+    }
+
+    function displayName(resource) {
+      const name = resource.name;
+      if (Array.isArray(name)) {
+        const first = name[0] || {};
+        return [first.given?.join(" "), first.family].filter(Boolean).join(" ") || first.text || "—";
+      }
+      return name || "—";
+    }
+
+    function referenceLabel(reference) {
+      return reference?.display || reference?.reference || "—";
+    }
+
+    function referencedResourceLabel(reference, resourceType, availableResources, identifierFallback) {
+      const id = reference?.reference?.match(new RegExp(`(?:^|/)${resourceType}/([^/?#]+)`))?.[1];
+      const resource = id ? availableResources.find(item => item.id === id) : null;
+      if (!resource) return referenceLabel(reference);
+      const identifier = resource.identifier?.find(item => item.value)?.value || identifierFallback(resource);
+      return `${identifier} — ${displayName(resource)}`;
+    }
+
+    function resourceRows(resource) {
+      if (activeTab === "Patient") {
+        return [
+          resource.identifier?.find(item => item.value)?.value || "—",
+          displayName(resource),
+          resource.gender || "—",
+          resource.birthDate || "—"
+        ];
+      }
+      if (activeTab === "Organization") {
+        const parentReference = resource.partOf?.reference;
+        const parentId = parentReference?.match(/(?:^|\/)Organization\/([^/?#]+)/)?.[1];
+        const parent = organizationResources.find(item => item.resourceType === "Organization" && item.id === parentId);
+        const parentName = resource.partOf?.display || parent?.name || parentReference || "—";
+        return [resource.name || "—", parentName, resource.active === false ? "Inaktiv" : "Aktiv", resource.identifier?.[0]?.value || "—"];
+      }
+      if (resource.resourceType === "Practitioner") {
+        return [
+          displayName(resource),
+          resource.gender || "—",
+          resource.telecom?.find(item => item.system === "phone")?.value || "—"
+        ];
+      }
+      return [resource.name || "—", resource.status || "—", referenceLabel(resource.subject)];
+    }
+
+    function careManagerTeams(practitioner) {
+      const practitionerReference = `Practitioner/${practitioner.id}`;
+      const roleIds = new Set(practitionerRoleResources
+        .filter(role => role.practitioner?.reference === practitionerReference)
+        .map(role => role.id));
+      const teamNames = visibleResources
+        .filter(resource => resource.resourceType === "CareTeam")
+        .filter(team => (team.participant || []).some(participant => {
+          const reference = participant.member?.reference || "";
+          if (reference === practitionerReference) return true;
+          const roleId = reference.match(/(?:^|\/)PractitionerRole\/([^/?#]+)/)?.[1];
+          return roleId ? roleIds.has(roleId) : false;
+        }))
+        .map(team => team.name || team.id)
+        .filter(Boolean);
+      return [...new Set(teamNames)].join(", ") || "—";
+    }
+
+    function careManagerPhones(practitioner) {
+      const phones = practitionerRolesFor(practitioner)
+        .flatMap(role => {
+          const contacts = Array.isArray(role.contact) ? role.contact : role.contact ? [role.contact] : [];
+          return contacts.flatMap(contact => {
+            const telecom = Array.isArray(contact.telecom) ? contact.telecom : contact.telecom ? [contact.telecom] : [];
+            return telecom
+              .filter(point => point.system === "phone" && point.value)
+              .map(point => point.value);
+          });
+        });
+      return [...new Set(phones)].join(", ") || "—";
+    }
+
+    function practitionerRolesFor(practitioner) {
+      const practitionerReference = `Practitioner/${practitioner.id}`;
+      const teamRoleIds = new Set(visibleResources
+        .filter(resource => resource.resourceType === "CareTeam")
+        .flatMap(team => (team.participant || [])
+          .map(participant => participant.member?.reference?.match(/(?:^|\/)PractitionerRole\/([^/?#]+)/)?.[1])
+          .filter(Boolean)));
+      return practitionerRoleResources.filter(role =>
+        role.practitioner?.reference === practitionerReference &&
+        (teamRoleIds.has(role.id) || isCareManagerRole(role))
+      );
+    }
+
+    function isCareManagerRole(role) {
+      return role.code?.some(codeableConcept => codeableConcept.coding?.some(coding =>
+        coding.system === CARE_MANAGER_ROLE_SYSTEM &&
+        CARE_MANAGER_ROLE_CODES.some(([code]) => code === coding.code)
+      )) || false;
+    }
+
+    function careManagerRoleFor(practitioner) {
+      return practitionerRolesFor(practitioner).find(isCareManagerRole) || null;
+    }
+
+    function careManagerRoleLabel(practitioner) {
+      const role = careManagerRoleFor(practitioner);
+      const coding = role?.code?.flatMap(codeableConcept => codeableConcept.coding || [])
+        .find(item => item.system === CARE_MANAGER_ROLE_SYSTEM &&
+          CARE_MANAGER_ROLE_CODES.some(([code]) => code === item.code));
+      return CARE_MANAGER_ROLE_CODES.find(([code]) => code === coding?.code)?.[1] || "—";
+    }
+
+    function careTeamCareManagerCode(team) {
+      const categories = Array.isArray(team?.category)
+        ? team.category
+        : team?.category ? [team.category] : [];
+      const coding = categories
+        .flatMap(category => Array.isArray(category?.coding) ? category.coding : category?.coding ? [category.coding] : [])
+        .find(item => item?.system === CARE_MANAGER_ROLE_SYSTEM &&
+          CARE_MANAGER_ROLE_CODES.some(([code]) => code === item.code));
+      return coding?.code || "";
+    }
+
+    function setCareTeamCareManagerCode(team, code) {
+      const categories = Array.isArray(team.category)
+        ? [...team.category]
+        : team.category ? [team.category] : [];
+      const categoryIndex = categories.findIndex(category => {
+        const codings = Array.isArray(category?.coding) ? category.coding : category?.coding ? [category.coding] : [];
+        return codings.some(coding => coding?.system === CARE_MANAGER_ROLE_SYSTEM);
+      });
+      const coding = {
+        system: CARE_MANAGER_ROLE_SYSTEM,
+        code,
+        display: CARE_MANAGER_ROLE_CODES.find(([value]) => value === code)?.[1] || code
+      };
+      if (categoryIndex < 0) {
+        categories.push({ coding: [coding] });
+      } else {
+        const category = categories[categoryIndex];
+        const codings = Array.isArray(category.coding) ? category.coding : category.coding ? [category.coding] : [];
+        categories[categoryIndex] = {
+          ...category,
+          coding: [...codings.filter(item => item.system !== CARE_MANAGER_ROLE_SYSTEM), coding]
+        };
+      }
+      team.category = categories;
+    }
+
+    function careTeamCareManagerType(team) {
+      const code = careTeamCareManagerCode(team);
+      return CARE_MANAGER_ROLE_CODES.find(([value]) => value === code)?.[1] || "—";
+    }
+
+    function removeCareManagerCodeFromParticipant(participant) {
+      const role = Array.isArray(participant.role) ? participant.role[0] : participant.role;
+      if (!role) return participant;
+      const codings = Array.isArray(role.coding) ? role.coding : role.coding ? [role.coding] : [];
+      const remainingCodings = codings.filter(coding => coding.system !== CARE_MANAGER_ROLE_SYSTEM);
+      if (remainingCodings.length) {
+        participant.role = { ...role, coding: remainingCodings };
+      } else {
+        delete participant.role;
+      }
+      return participant;
+    }
+
+    function isFastContactCareTeam(team) {
+      if (!team || team.resourceType !== "CareTeam") return false;
+      const participants = Array.isArray(team.participant)
+        ? team.participant
+        : team.participant ? [team.participant] : [];
+      return participants.length === 1;
+    }
+
+    function isMultiParticipantCareTeam(team) {
+      return team?.resourceType === "CareTeam" &&
+        Array.isArray(team.participant) &&
+        team.participant.length >= 2;
+    }
+
+    function careTeamPractitionerRoles(team) {
+      const roles = (team.participant || [])
+        .map(participant => {
+          const reference = participant.member?.reference || "";
+          const directPractitionerId = reference.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1];
+          if (directPractitionerId) {
+            const practitioner = practitionerResources.find(item => item.id === directPractitionerId);
+            return practitioner ? displayName(practitioner) : "Okänd vårdpersonal";
+          }
+          const roleId = reference.match(/(?:^|\/)PractitionerRole\/([^/?#]+)/)?.[1];
+          if (!roleId) return null;
+          const role = practitionerRoleResources.find(item => item.id === roleId);
+          const practitionerId = role?.practitioner?.reference?.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1];
+          const practitioner = practitionerResources.find(item =>
+            item.id === practitionerId
+          );
+          return practitioner
+            ? displayName(practitioner)
+            : "Okänd vårdpersonal";
+        })
+        .filter(Boolean);
+      return [...new Set(roles)].join(", ") || "—";
+    }
+
+    function careTeamMemberFields(resource) {
+      const currentParticipants = resource?.participant || [];
+      const selectedReferences = new Set(currentParticipants.map(item => item.member?.reference).filter(Boolean));
+      const choices = new Map();
+      const representedPractitioners = new Set();
+      const practitionerForReference = reference => {
+        const practitionerId = reference?.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1];
+        if (practitionerId) {
+          return practitionerResources.find(item => item.id === practitionerId);
+        }
+        const roleId = reference?.match(/(?:^|\/)PractitionerRole\/([^/?#]+)/)?.[1];
+        const role = roleId ? practitionerRoleResources.find(item => item.id === roleId) : null;
+        const linkedPractitionerId = role?.practitioner?.reference?.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1];
+        return linkedPractitionerId
+          ? practitionerResources.find(item => item.id === linkedPractitionerId)
+          : null;
+      };
+      for (const participant of currentParticipants) {
+        const reference = participant.member?.reference;
+        if (!reference) continue;
+        const practitioner = practitionerForReference(reference);
+        if (practitioner) representedPractitioners.add(practitioner.id);
+        choices.set(
+          reference,
+          practitioner ? displayName(practitioner) : participant.member.display || reference
+        );
+      }
+      for (const role of practitionerRoleResources) {
+        if (!role.id) continue;
+        const reference = `PractitionerRole/${role.id}`;
+        const practitionerId = role.practitioner?.reference?.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1];
+        if (practitionerId && representedPractitioners.has(practitionerId)) continue;
+        const practitioner = practitionerResources.find(item =>
+          item.id === practitionerId
+        );
+        const roleName = role.code?.flatMap(item => item.coding || []).find(coding => coding.display)?.display;
+        const label = [
+          practitioner ? displayName(practitioner) : reference,
+          roleName
+        ].filter(Boolean).join(" — ");
+        choices.set(reference, label);
+        if (practitionerId) representedPractitioners.add(practitionerId);
+      }
+      for (const practitioner of practitionerResources) {
+        if (!practitioner.id || representedPractitioners.has(practitioner.id)) continue;
+        choices.set(`Practitioner/${practitioner.id}`, displayName(practitioner));
+      }
+
+      const options = [...choices].map(([reference, label], index) => {
+        const id = `field-team-member-${index}`;
+        return `<label class="member-option" for="${id}">
+          <input id="${id}" name="participants" type="checkbox" value="${escapeHtml(reference)}" ${selectedReferences.has(reference) ? "checked" : ""}>
+          <span>${escapeHtml(label)}</span>
+        </label>`;
+      }).join("");
+      return `<fieldset class="field">
+        <legend>Medlemmar</legend>
+        <small>Markera vårdpersonal som ska ingå i teamet. Avmarkera en medlem för att ta bort den.</small>
+        <div class="member-options">${options || "<p>Ingen vårdpersonal hittades.</p>"}</div>
+      </fieldset>`;
+    }
+
+    function careTeamPractitionerFields(practitioners) {
+      const options = practitioners
+        .filter(practitioner => practitioner.id)
+        .map((practitioner, index) => {
+          const reference = `Practitioner/${practitioner.id}`;
+          const id = `field-team-practitioner-${index}`;
+          const identifier = practitioner.identifier?.find(item => item.value)?.value;
+          const label = [displayName(practitioner), identifier].filter(Boolean).join(" — ");
+          return `<label class="member-option" for="${id}">
+            <input id="${id}" name="participants" type="checkbox" value="${escapeHtml(reference)}">
+            <span>${escapeHtml(label)}</span>
+          </label>`;
+        }).join("");
+      return `<fieldset class="field">
+        <legend>Vårdpersonal</legend>
+        <small>Välj minst två personer som ska ingå i teamet.</small>
+        <div class="member-options">${options || "<p>Inga vårdpersonal hittades.</p>"}</div>
+        <p id="team-participant-error" class="notice error" role="alert" hidden>Välj minst två vårdpersonal för teamet.</p>
+      </fieldset>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+    }
+
+    function organizationHierarchy(organizations) {
+      const byId = new Map(organizations.filter(item => item.id).map(item => [item.id, item]));
+      const children = new Map();
+      const roots = [];
+      for (const organization of organizations) {
+        const parentId = organization.partOf?.reference?.match(/(?:^|\/)Organization\/([^/?#]+)/)?.[1];
+        const parent = parentId ? byId.get(parentId) : null;
+        if (parent && parent !== organization) {
+          const siblings = children.get(parent.id) || [];
+          siblings.push(organization);
+          children.set(parent.id, siblings);
+        } else {
+          roots.push(organization);
+        }
+      }
+
+      const sortByName = (left, right) => (left.name || "").localeCompare(right.name || "", "sv");
+      roots.sort(sortByName);
+      for (const siblings of children.values()) siblings.sort(sortByName);
+
+      const ordered = [];
+      const visited = new Set();
+      function addBranch(organization, depth) {
+        if (visited.has(organization)) return;
+        visited.add(organization);
+        ordered.push({ resource: organization, depth });
+        for (const child of children.get(organization.id) || []) addBranch(child, depth + 1);
+      }
+      for (const root of roots) addBranch(root, 0);
+      for (const organization of [...organizations].sort(sortByName)) addBranch(organization, 0);
+      return ordered;
+    }
+
+    function renderTable() {
+      const singleList = document.getElementById("single-list");
+      const contactLists = document.getElementById("contact-lists");
+      const teamList = document.getElementById("team-list");
+      const hideSingleList = activeTab === "Fast kontakt" || activeTab === "Team";
+      singleList.hidden = hideSingleList;
+      contactLists.hidden = activeTab !== "Fast kontakt";
+      teamList.hidden = activeTab !== "Team";
+      if (activeTab === "Fast kontakt") {
+        renderContactList("CareTeam", "care-manager", ["Namn", "Typ", "Status", "Patient"], isFastContactCareTeam);
+        return;
+      }
+      if (activeTab === "Team") {
+        renderContactList("CareTeam", "care-team", ["Namn", "Typ", "Status", "Patient", "Medlemmar"], isMultiParticipantCareTeam);
+        return;
+      }
+
+      const kinds = [activeTab];
+      const columns = resources[activeTab].columns;
+      document.getElementById("table-head").innerHTML =
+        `<tr>${columns.map(column => `<th scope="col">${escapeHtml(column)}</th>`).join("")}<th scope="col"><span class="sr-only">Åtgärder</span></th></tr>`;
+      const rows = activeTab === "Organization"
+        ? organizationHierarchy(visibleResources.filter(resource => kinds.includes(resource.resourceType)))
+        : visibleResources.filter(resource => kinds.includes(resource.resourceType)).map(resource => ({ resource, depth: 0 }));
+      if (!rows.length) {
+        document.getElementById("table-body").innerHTML =
+          `<tr><td class="empty" colspan="${columns.length + 1}">Inga resurser hittades.</td></tr>`;
+        return;
+      }
+      document.getElementById("table-body").innerHTML = rows.map(({ resource, depth }, index) => {
+        const values = resourceRows(resource);
+        if (activeTab === "Fast kontakt") values.unshift(resources[resource.resourceType].label);
+        return `<tr>${values.map((value, column) => `<td>${column === 0 && activeTab === "Organization"
+          ? `<span class="organization-name" style="--depth:${Math.min(depth, 20)}">${escapeHtml(value)}</span>`
+          : escapeHtml(value)}</td>`).join("")}<td class="actions">
+          <button class="action" type="button" data-action="edit" data-index="${index}">Redigera</button>
+          <button class="action danger" type="button" data-action="delete" data-index="${index}">Ta bort</button>
+        </td></tr>`;
+      }).join("");
+      document.querySelectorAll("[data-action]").forEach(button => {
+        button.addEventListener("click", () => handleRowAction(button.dataset.action, rows[Number(button.dataset.index)].resource));
+      });
+    }
+
+    function renderContactList(resourceType, idPrefix, columns, filterResource = () => true) {
+      const resourcesForList = visibleResources.filter(resource =>
+        resource.resourceType === resourceType && filterResource(resource)
+      );
+      document.getElementById(`${idPrefix}-head`).innerHTML =
+        `<tr>${columns.map(column => `<th scope="col">${escapeHtml(column)}</th>`).join("")}<th scope="col"><span class="sr-only">Åtgärder</span></th></tr>`;
+      const body = document.getElementById(`${idPrefix}-body`);
+      if (!resourcesForList.length) {
+        body.innerHTML = `<tr><td class="empty" colspan="${columns.length + 1}">Inga ${resourceType === "Practitioner" ? "fasta kontakter" : "team"} hittades.</td></tr>`;
+        return;
+      }
+      body.innerHTML = resourcesForList.map((resource, index) => {
+        const values = resourceType === "Practitioner"
+          ? [
+            displayName(resource),
+            resource.gender || "—",
+            careManagerPhones(resource),
+            resource.telecom?.find(item => item.system === "phone")?.value || "—",
+            careManagerRoleLabel(resource),
+            careManagerTeams(resource)
+          ]
+          : [
+            resource.name || "—",
+            careTeamCareManagerType(resource),
+            resource.status || "—",
+            referenceLabel(resource.subject),
+            ...(idPrefix === "care-team" ? [careTeamPractitionerRoles(resource)] : [])
+          ];
+        return `<tr>${values.map(value => `<td>${escapeHtml(value)}</td>`).join("")}<td class="actions">
+          <button class="action" type="button" data-contact-action="edit" data-index="${index}">Redigera</button>
+          <button class="action danger" type="button" data-contact-action="delete" data-index="${index}">Ta bort</button>
+        </td></tr>`;
+      }).join("");
+      body.querySelectorAll("[data-contact-action]").forEach(button => {
+        button.addEventListener("click", () => handleRowAction(
+          button.dataset.contactAction,
+          resourcesForList[Number(button.dataset.index)]
+        ));
+      });
+    }
+
+    async function loadResources() {
+      showNotice("");
+      if (activeTab === "Fast kontakt") {
+        document.getElementById("care-manager-body").innerHTML = `<tr><td class="empty" colspan="5">Hämtar från FHIR-servern…</td></tr>`;
+      } else if (activeTab === "Team") {
+        document.getElementById("care-team-body").innerHTML = `<tr><td class="empty" colspan="5">Hämtar från FHIR-servern…</td></tr>`;
+      } else {
+        document.getElementById("table-body").innerHTML =
+          `<tr><td class="empty" colspan="5">Hämtar från FHIR-servern…</td></tr>`;
+      }
+      const kinds = activeTab === "Fast kontakt" ? ["CareTeam"]
+        : activeTab === "Team" ? ["CareTeam"]
+        : [activeTab];
+      try {
+        const query = document.getElementById("search-input").value.trim();
+        const resourceTypes = kinds;
+        const results = await Promise.all(resourceTypes.map(async kind => {
+          const params = new URLSearchParams({ _count: "100", _sort: "-_lastUpdated" });
+          if (query) params.set("name:contains", query);
+          const bundle = await request(`${kind}?${params.toString()}`);
+          return (bundle.entry || []).map(entry => entry.resource).filter(Boolean);
+        }));
+        if (activeTab === "Fast kontakt") {
+          visibleResources = results.flat();
+          try {
+            const roleBundle = await request("PractitionerRole?_count=100");
+            practitionerRoleResources = (roleBundle.entry || []).map(entry => entry.resource)
+              .filter(item => item?.resourceType === "PractitionerRole");
+          } catch (error) {
+            practitionerRoleResources = [];
+            showNotice(`Kunde inte läsa PractitionerRole-resurser för att koppla fasta kontakter till team: ${error.message}`, true);
+          }
+        } else if (activeTab === "Team") {
+          visibleResources = results.flat();
+          try {
+            const roleIds = [...new Set(visibleResources.flatMap(team =>
+              (team.participant || [])
+                .map(participant => participant.member?.reference?.match(/(?:^|\/)PractitionerRole\/([^/?#]+)/)?.[1])
+                .filter(Boolean)
+            ))];
+            const roleBundle = roleIds.length
+              ? await request(`PractitionerRole?_id=${encodeURIComponent(roleIds.join(","))}`)
+              : { entry: [] };
+            practitionerRoleResources = (roleBundle.entry || []).map(entry => entry.resource)
+              .filter(item => item?.resourceType === "PractitionerRole");
+            const practitionerIds = [...new Set(practitionerRoleResources.flatMap(role => {
+              const id = role.practitioner?.reference?.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1];
+              return id ? [id] : [];
+            }).concat(visibleResources.flatMap(team =>
+              (team.participant || [])
+                .map(participant => participant.member?.reference?.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1])
+                .filter(Boolean)
+            )))];
+            const practitionerBundle = practitionerIds.length
+              ? await request(`Practitioner?_id=${encodeURIComponent(practitionerIds.join(","))}`)
+              : { entry: [] };
+            practitionerResources = (practitionerBundle.entry || []).map(entry => entry.resource)
+              .filter(item => item?.resourceType === "Practitioner");
+          } catch (error) {
+            practitionerRoleResources = [];
+            practitionerResources = [];
+            showNotice(`Kunde inte läsa PractitionerRole- eller Practitioner-resurser för teammedlemmar: ${error.message}`, true);
+          }
+        } else {
+          visibleResources = results.flat();
+        }
+        renderTable();
+      } catch (error) {
+        visibleResources = [];
+        renderTable();
+        showNotice(`Kunde inte läsa från FHIR-servern (${FHIR_BASE_URL}). Kontrollera att servern är igång och tillåter CORS. ${error.message}`, true);
+      }
+    }
+
+    function field(name, label, type = "text", value = "", options = {}) {
+      const safeName = escapeHtml(name);
+      const safeLabel = escapeHtml(label);
+      const id = `field-${safeName}`;
+      if (type === "checkbox") {
+        return `<div class="field checkbox"><input id="${id}" name="${safeName}" type="checkbox" ${value ? "checked" : ""}><label for="${id}">${safeLabel}</label></div>`;
+      }
+      if (type === "select") {
+        const choices = options.choices.map(([choice, title]) =>
+          `<option value="${escapeHtml(choice)}" ${value === choice ? "selected" : ""}>${escapeHtml(title)}</option>`).join("");
+        return `<div class="field"><label for="${id}">${safeLabel}</label><select id="${id}" name="${safeName}">${choices}</select></div>`;
+      }
+      if (type === "textarea") {
+        return `<div class="field"><label for="${id}">${safeLabel}</label><textarea id="${id}" name="${safeName}" ${options.required ? "required" : ""}>${escapeHtml(value)}</textarea>${options.help ? `<small>${escapeHtml(options.help)}</small>` : ""}</div>`;
+      }
+      return `<div class="field"><label for="${id}">${safeLabel}</label><input id="${id}" name="${safeName}" type="${type}" value="${escapeHtml(value)}" ${options.required ? "required" : ""} ${options.maxlength ? `maxlength="${options.maxlength}"` : ""}>${options.help ? `<small>${escapeHtml(options.help)}</small>` : ""}</div>`;
+    }
+
+    function formValues(resource, organizationChoices = [], patientChoices = [], practitionerRoles = [], existingPractitioners = []) {
+      const humanName = Array.isArray(resource?.name) ? resource.name[0] || {} : {};
+      const telecom = resource?.telecom || [];
+      if (activeTab === "Patient") {
+        return field("personnummer", "Personnummer", "text", resource?.identifier?.find(item => item.value)?.value || "", {
+          help: "Ange personnumret utan eller med bindestreck."
+        }) +
+          field("given", "Förnamn", "text", humanName.given?.join(" ") || "", { required: true }) +
+          field("family", "Efternamn", "text", humanName.family || "", { required: true }) +
+          field("gender", "Kön", "select", resource?.gender || "", { choices: [["", "Ange…"], ["female", "Kvinna"], ["male", "Man"], ["other", "Annat"], ["unknown", "Okänt"]] }) +
+          field("birthDate", "Födelsedatum", "date", resource?.birthDate || "") +
+          field("active", "Aktiv", "checkbox", resource?.active !== false);
+      }
+      if (activeTab === "Organization") {
+        const parentReference = resource?.partOf?.reference || "";
+        const excludedIds = new Set();
+        if (resource?.id) {
+          const descendants = [resource.id];
+          while (descendants.length) {
+            const ancestorId = descendants.pop();
+            if (excludedIds.has(ancestorId)) continue;
+            excludedIds.add(ancestorId);
+            for (const organization of organizationChoices) {
+              const parentId = organization.partOf?.reference?.match(/(?:^|\/)Organization\/([^/?#]+)/)?.[1];
+              if (parentId === ancestorId && organization.id) descendants.push(organization.id);
+            }
+          }
+        }
+        const parentChoices = [["", "Ingen (toppnivå)"], ...organizationChoices
+          .filter(organization => organization.id && !excludedIds.has(organization.id))
+          .map(organization => [`Organization/${organization.id}`, organization.name || `Organization/${organization.id}`])];
+        if (parentReference && !parentChoices.some(([reference]) => reference === parentReference)) {
+          parentChoices.push([parentReference, resource.partOf.display || parentReference]);
+        }
+        return field("name", "Organisationsnamn", "text", resource?.name || "", { required: true }) +
+          field("identifier", "Organisations-ID", "text", resource?.identifier?.[0]?.value || "") +
+          field("partOf", "Närmast överordnad organisation", "select", parentReference, { choices: parentChoices }) +
+          field("active", "Aktiv", "checkbox", resource?.active !== false);
+      }
+      if (activeTab === "Fast kontakt" && resource?.resourceType === "CareTeam") {
+        return careManagerCareTeamFields(
+          resource,
+          organizationChoices,
+          patientChoices,
+          existingPractitioners,
+          editingCareTeamRole
+        );
+      }
+      const isTeamForm = activeTab === "Team" || (activeTab === "Fast kontakt" &&
+        (resource?.resourceType === "CareTeam" || (!resource && document.getElementById("contact-kind")?.value === "CareTeam")));
+      if (isTeamForm) {
+        const patientReference = resource?.subject?.reference || "";
+        const patientOptions = [["", "Ingen patient"], ...patientChoices
+          .filter(patient => patient.id)
+          .map(patient => {
+            const identifier = patient.identifier?.find(item => item.value)?.value;
+            return [`Patient/${patient.id}`, [identifier, displayName(patient)].filter(Boolean).join(" — ")];
+          })];
+        if (patientReference && !patientOptions.some(([reference]) => reference === patientReference)) {
+          patientOptions.push([patientReference, resource.subject?.display || patientReference]);
+        }
+        const organizationReference = resource?.managingOrganization?.[0]?.reference ||
+          resource?.managingOrganization?.reference || "";
+        const organizationOptions = [["", "Ingen organisation"], ...organizationChoices
+          .filter(organization => organization.id)
+          .map(organization => {
+            const identifier = organization.identifier?.find(item => item.value)?.value;
+            return [`Organization/${organization.id}`, [identifier, organization.name || "Namnlös organisation"].filter(Boolean).join(" — ")];
+          })];
+        if (organizationReference && !organizationOptions.some(([reference]) => reference === organizationReference)) {
+          organizationOptions.push([organizationReference,
+            resource?.managingOrganization?.[0]?.display ||
+            resource?.managingOrganization?.display ||
+            organizationReference]);
+        }
+        return field("name", "Namn på team", "text", resource?.name || "", { required: true }) +
+          field("status", "Status", "select", resource?.status || "active", { choices: [["active", "Aktiv"], ["proposed", "Planerad"], ["suspended", "Pausad"], ["inactive", "Inaktiv"], ["entered-in-error", "Felregistrerad"]] }) +
+          field("subject", "Patient", "select", patientReference, { choices: patientOptions }) +
+          field("managingOrganization", "Organisation", "select", organizationReference, { choices: organizationOptions }) +
+          careTeamPeriodFields(resource) +
+          (activeTab === "Team"
+            ? field("teamPhone", "Telefonnummer", "tel", resource?.telecom?.find(point => point.system === "phone")?.value || "")
+            : "") +
+          (activeTab === "Team"
+            ? field("teamRoleCode", "Typ av team", "select", careTeamCareManagerCode(resource) || "1", { choices: CARE_MANAGER_ROLE_CODES })
+            : "") +
+          (activeTab === "Team" && !resource
+            ? careTeamPractitionerFields(existingPractitioners)
+            : careTeamMemberFields(resource));
+      }
+      const isCareManagerCreate = activeTab === "Fast kontakt" && !resource;
+      if (isCareManagerCreate) {
+        const practitionerChoices = [["", "Välj befintlig vårdpersonal…"], ...existingPractitioners
+          .filter(practitioner => practitioner.id)
+          .map(practitioner => {
+            const identifier = practitioner.identifier?.find(item => item.value)?.value || `Practitioner/${practitioner.id}`;
+            return [`Practitioner/${practitioner.id}`, `${displayName(practitioner)} — ${identifier}`];
+          })];
+        const patientOptions = [["", "Ingen patient"], ...patientChoices
+          .filter(patient => patient.id)
+          .map(patient => {
+            const identifier = patient.identifier?.find(item => item.value)?.value;
+            const label = [identifier, displayName(patient)].filter(Boolean).join(" — ");
+            return [`Patient/${patient.id}`, label];
+          })];
+        return field("practitionerReference", "Befintlig vårdpersonal", "select", "", {
+          required: true,
+          choices: practitionerChoices,
+          help: "Välj en befintlig Practitioner som den fasta kontakten ska kopplas till."
+        }) +
+          field("careManagerRolePhone", "Telefonnummer för fast kontakt", "tel", "") +
+          field("careTeamSubject", "Patient", "select", "", { choices: patientOptions }) +
+          careManagerOrganizationField(organizationChoices) +
+          field("careManagerRoleCode", "Typ av fast kontakt", "select", "1", {
+            choices: CARE_MANAGER_ROLE_CODES
+          }) +
+          careTeamPeriodFields(null);
+      }
+      const isCareManagerForm = activeTab === "Fast kontakt" &&
+        (resource?.resourceType === "Practitioner" || !resource);
+      const roleCode = editingCareManagerRole?.code
+        ?.flatMap(codeableConcept => codeableConcept.coding || [])
+        .find(coding => coding.system === CARE_MANAGER_ROLE_SYSTEM)?.code || "1";
+      const roleCodeField = isCareManagerForm
+        ? field("careManagerRoleCode", "Typ av fast kontakt", "select", roleCode, {
+          choices: CARE_MANAGER_ROLE_CODES
+        })
+        : "";
+      const roleOrganizationField = isCareManagerForm
+        ? careManagerOrganizationField(organizationChoices, editingCareManagerRole)
+        : "";
+      const isCareManagerEdit = activeTab === "Fast kontakt" && resource?.resourceType === "Practitioner";
+      const rolePhoneFields = isCareManagerEdit
+        ? practitionerRoles.map(role => {
+          const roleContacts = Array.isArray(role.contact) ? role.contact : role.contact ? [role.contact] : [];
+          const phone = roleContacts
+            .flatMap(contact => Array.isArray(contact.telecom) ? contact.telecom : contact.telecom ? [contact.telecom] : [])
+            .find(point => point.system === "phone")?.value || "";
+          const roleName = role.code?.flatMap(item => item.coding || []).find(coding => coding.display)?.display;
+          return field(
+            `rolePhone-${role.id}`,
+            `Telefonnummer för roll: ${roleName || `PractitionerRole/${role.id}`}`,
+            "tel",
+            phone
+          );
+        }).join("")
+        : "";
+      return field("given", "Förnamn", "text", humanName.given?.join(" ") || "", { required: true }) +
+        field("family", "Efternamn", "text", humanName.family || "", { required: true }) +
+        field("gender", "Kön", "select", resource?.gender || "", { choices: [["", "Ange…"], ["female", "Kvinna"], ["male", "Man"], ["other", "Annat"], ["unknown", "Okänt"]] }) +
+        field("phone", isCareManagerEdit ? "Personligt telefonnummer" : "Telefon", "tel", telecom.find(item => item.system === "phone")?.value || "") +
+        field("email", "E-post", "email", telecom.find(item => item.system === "email")?.value || "") +
+        field("active", "Aktiv", "checkbox", resource?.active !== false) +
+        roleCodeField +
+        roleOrganizationField +
+        rolePhoneFields;
+    }
+
+    function careManagerOrganizationField(organizations, role = null) {
+      const organizationReference = role?.organization?.reference || "";
+      const choices = [["", "Ingen organisation"], ...organizations
+        .filter(organization => organization.id)
+        .map(organization => {
+          const identifier = organization.identifier?.find(item => item.value)?.value || organization.id;
+          return [`Organization/${organization.id}`, `${identifier} — ${organization.name || "Namnlös organisation"}`];
+        })];
+      if (organizationReference && !choices.some(([reference]) => reference === organizationReference)) {
+        choices.push([organizationReference, role.organization.display || organizationReference]);
+      }
+      return field("careManagerOrganization", "Organisation", "select", organizationReference, { choices });
+    }
+
+    function careManagerCareTeamFields(team, organizations, patients, practitioners, role) {
+      const participant = team.participant?.[0] || {};
+      const practitionerReference = role?.practitioner?.reference || "";
+      const practitionerOptions = [["", "Välj vårdpersonal…"], ...practitioners
+        .filter(item => item.id)
+        .map(item => [`Practitioner/${item.id}`, displayName(item)])];
+      if (practitionerReference && !practitionerOptions.some(([reference]) => reference === practitionerReference)) {
+        practitionerOptions.push([practitionerReference, role.practitioner.display || practitionerReference]);
+      }
+
+      const patientOptions = [["", "Ingen patient"], ...patients
+        .filter(item => item.id)
+        .map(item => {
+          const identifier = item.identifier?.find(value => value.value)?.value;
+          return [`Patient/${item.id}`, [identifier, displayName(item)].filter(Boolean).join(" — ")];
+        })];
+      const patientReference = team.subject?.reference || "";
+      if (patientReference && !patientOptions.some(([reference]) => reference === patientReference)) {
+        patientOptions.push([patientReference, team.subject.display || patientReference]);
+      }
+
+      const organizationReference = team.managingOrganization?.[0]?.reference ||
+        team.managingOrganization?.reference || "";
+      const organizationOptions = [["", "Ingen organisation"], ...organizations
+        .filter(item => item.id)
+        .map(item => [`Organization/${item.id}`, item.name || `Organization/${item.id}`])];
+      if (organizationReference && !organizationOptions.some(([reference]) => reference === organizationReference)) {
+        organizationOptions.push([organizationReference,
+          team.managingOrganization?.[0]?.display ||
+          team.managingOrganization?.display ||
+          organizationReference]);
+      }
+
+      const phone = (Array.isArray(role?.contact) ? role.contact : role?.contact ? [role.contact] : [])
+        .flatMap(contact => Array.isArray(contact.telecom) ? contact.telecom : contact.telecom ? [contact.telecom] : [])
+        .find(point => point.system === "phone")?.value || "";
+      const roleCode = careTeamCareManagerCode(team);
+      return field("name", "Namn på team", "text", team.name || "", { required: true }) +
+        field("status", "Status", "select", team.status || "active", { choices: [["active", "Aktiv"], ["proposed", "Planerad"], ["suspended", "Pausad"], ["inactive", "Inaktiv"], ["entered-in-error", "Felregistrerad"]] }) +
+        field("practitionerReference", "Vårdpersonal", "select", practitionerReference, { required: true, choices: practitionerOptions }) +
+        field("careManagerRolePhone", "Telefonnummer för fast kontakt", "tel", phone) +
+        field("subject", "Patient", "select", patientReference, { choices: patientOptions }) +
+        field("managingOrganization", "Organisation", "select", organizationReference, { choices: organizationOptions }) +
+        field("careManagerRoleCode", "Typ av fast kontakt", "select", roleCode, { required: true, choices: CARE_MANAGER_ROLE_CODES }) +
+        careTeamPeriodFields(team);
+    }
+
+    function careTeamPeriodFields(team) {
+      return field("careTeamPeriodStart", "Giltig från och med", "date", team?.period?.start?.slice(0, 10) || "") +
+        field("careTeamPeriodEnd", "Giltig till och med", "date", team?.period?.end?.slice(0, 10) || "");
+    }
+
+    function applyCareTeamPeriod(team, formData) {
+      const period = { ...(team.period || {}) };
+      const start = String(formData.get("careTeamPeriodStart") || "").trim();
+      const end = String(formData.get("careTeamPeriodEnd") || "").trim();
+      if (start) period.start = start;
+      else delete period.start;
+      if (end) period.end = end;
+      else delete period.end;
+      if (Object.keys(period).length) team.period = period;
+      else delete team.period;
+    }
+
+    function validateCareTeamPeriod(form) {
+      const start = form.querySelector('[name="careTeamPeriodStart"]');
+      const end = form.querySelector('[name="careTeamPeriodEnd"]');
+      if (!end) return true;
+      const isInvalid = start?.value && end.value && start.value > end.value;
+      end.setCustomValidity(isInvalid
+        ? "Giltig till och med måste vara samma datum som eller senare än Giltig från och med."
+        : "");
+      return !isInvalid;
+    }
+
+    async function openForm(resource = null) {
+      editingResource = resource;
+      editingPractitionerRoles = activeTab === "Fast kontakt" && resource?.resourceType === "Practitioner"
+        ? practitionerRolesFor(resource).map(role => structuredClone(role))
+        : [];
+      editingCareManagerRole = activeTab === "Fast kontakt" && resource?.resourceType === "Practitioner"
+        ? careManagerRoleFor(resource)
+        : null;
+      editingCareTeamRole = null;
+      const title = resource ? `Redigera ${resource.resourceType === "Practitioner" && activeTab === "Fast kontakt" ? "fast kontakt" : resources[resource.resourceType].label.toLowerCase()}` :
+        `Lägg till ${activeTab === "Fast kontakt" ? "fast kontakt" : activeTab === "Team" ? "team" : resources[activeTab].label.toLowerCase()}`;
+      document.getElementById("dialog-title").textContent = title;
+      const fields = document.getElementById("form-fields");
+      let organizationChoices = [];
+      patientChoices = [];
+      if (activeTab === "Fast kontakt") {
+        try {
+          const bundle = await request("Organization?_count=100&_sort=name");
+          organizationChoices = (bundle.entry || []).map(entry => entry.resource)
+            .filter(item => item?.resourceType === "Organization");
+          organizationResources = organizationChoices;
+        } catch (error) {
+          organizationChoices = organizationResources.length
+            ? organizationResources
+            : visibleResources.filter(item => item.resourceType === "Organization");
+          showNotice(`Kunde inte läsa organisationer för listan med fasta kontakter: ${error.message}`, true);
+        }
+      }
+      if (activeTab === "Fast kontakt" && (!resource || resource?.resourceType === "CareTeam")) {
+        const [practitionerResult, patientResult] = await Promise.allSettled([
+          request("Practitioner?_count=100&_sort=name"),
+          request("Patient?_count=100&_sort=name")
+        ]);
+        if (practitionerResult.status === "fulfilled") {
+          practitionerChoices = (practitionerResult.value.entry || []).map(entry => entry.resource)
+            .filter(item => item?.resourceType === "Practitioner");
+        } else {
+          practitionerChoices = visibleResources.filter(item => item.resourceType === "Practitioner");
+          showNotice(`Kunde inte läsa vårdpersonal för listan med fasta kontakter: ${practitionerResult.reason.message}`, true);
+        }
+        if (patientResult.status === "fulfilled") {
+          patientChoices = (patientResult.value.entry || []).map(entry => entry.resource)
+            .filter(item => item?.resourceType === "Patient");
+        } else {
+          showNotice(`Kunde inte läsa patienter för listan med fasta kontakter: ${patientResult.reason.message}`, true);
+        }
+        practitionerResources = practitionerChoices;
+        if (resource?.resourceType === "CareTeam") {
+          const memberReference = resource.participant?.[0]?.member?.reference || "";
+          const roleId = memberReference.match(/(?:^|\/)PractitionerRole\/([^/?#]+)/)?.[1];
+          if (roleId) {
+            try {
+              editingCareTeamRole = await request(`PractitionerRole/${encodeURIComponent(roleId)}`);
+              const practitionerId = editingCareTeamRole?.practitioner?.reference
+                ?.match(/(?:^|\/)Practitioner\/([^/?#]+)/)?.[1];
+              if (practitionerId && !practitionerChoices.some(item => item.id === practitionerId)) {
+                const practitioner = await request(`Practitioner/${encodeURIComponent(practitionerId)}`);
+                if (practitioner?.resourceType === "Practitioner") {
+                  practitionerChoices.push(practitioner);
+                  practitionerResources.push(practitioner);
+                }
+              }
+            } catch (error) {
+              showNotice(`Kunde inte läsa PractitionerRole för den fasta kontakten: ${error.message}`, true);
+            }
+          } else {
+            showNotice("Den fasta kontakten saknar en PractitionerRole-referens.", true);
+          }
+        }
+        fields.innerHTML = resource
+          ? careManagerCareTeamFields(resource, organizationChoices, patientChoices, practitionerChoices, editingCareTeamRole)
+          : formValues(null, organizationChoices, patientChoices, [], practitionerChoices);
+      } else if (activeTab === "Team") {
+        const [practitionerResult, patientResult, organizationResult] = await Promise.allSettled([
+          request("Practitioner?_count=100&_sort=name"),
+          request("Patient?_count=100&_sort=name"),
+          request("Organization?_count=100&_sort=name")
+        ]);
+        const loadErrors = [];
+        if (practitionerResult.status === "fulfilled") {
+          practitionerChoices = (practitionerResult.value.entry || []).map(entry => entry.resource)
+            .filter(item => item?.resourceType === "Practitioner");
+          practitionerResources = practitionerChoices;
+        } else {
+          practitionerChoices = [];
+          loadErrors.push(`vårdpersonal: ${practitionerResult.reason.message}`);
+        }
+        if (patientResult.status === "fulfilled") {
+          patientChoices = (patientResult.value.entry || []).map(entry => entry.resource)
+            .filter(item => item?.resourceType === "Patient");
+        } else {
+          patientChoices = [];
+          loadErrors.push(`patienter: ${patientResult.reason.message}`);
+        }
+        if (organizationResult.status === "fulfilled") {
+          organizationChoices = (organizationResult.value.entry || []).map(entry => entry.resource)
+            .filter(item => item?.resourceType === "Organization");
+          organizationResources = organizationChoices;
+        } else {
+          organizationChoices = organizationResources;
+          loadErrors.push(`organisationer: ${organizationResult.reason.message}`);
+        }
+        if (loadErrors.length) {
+          showNotice(`Kunde inte läsa ${loadErrors.join("; ")} för det nya teamet.`, true);
+        }
+        fields.innerHTML = formValues(resource, organizationChoices, patientChoices, [], practitionerChoices);
+        if (!resource) {
+          fields.querySelectorAll('input[name="participants"]').forEach(input => {
+            input.addEventListener("change", () => {
+              const selectedCount = fields.querySelectorAll('input[name="participants"]:checked').length;
+              if (selectedCount >= 2) document.getElementById("team-participant-error").hidden = true;
+            });
+          });
+        }
+      } else {
+        if (activeTab === "Organization") {
+          try {
+            const bundle = await request("Organization?_count=100");
+            organizationChoices = (bundle.entry || []).map(entry => entry.resource)
+              .filter(item => item?.resourceType === "Organization");
+            organizationResources = organizationChoices;
+          } catch (error) {
+            showNotice(`Kunde inte läsa organisationer för överordnad organisation: ${error.message}`, true);
+            organizationChoices = organizationResources.length
+              ? organizationResources
+              : visibleResources.filter(item => item.resourceType === "Organization");
+          }
+        }
+        fields.innerHTML = formValues(resource, organizationChoices, patientChoices, editingPractitionerRoles);
+      }
+      fields.querySelectorAll('[name="careTeamPeriodStart"], [name="careTeamPeriodEnd"]').forEach(input => {
+        input.addEventListener("input", () => validateCareTeamPeriod(fields.closest("form")));
+      });
+      dialog.showModal();
+      (fields.querySelector("input:not([type=checkbox]), select") || fields.querySelector("input")).focus();
+    }
+
+    function buildResource(formData) {
+      const isEditing = Boolean(editingResource);
+      const type = editingResource?.resourceType || (activeTab === "Fast kontakt"
+        ? formData.get("contact-kind")
+        : activeTab === "Team"
+          ? "CareTeam"
+          : activeTab);
+      const resource = isEditing ? structuredClone(editingResource) : { resourceType: type };
+      const setHumanName = () => {
+        const existing = Array.isArray(resource.name) ? [...resource.name] : [];
+        const name = { ...(existing[0] || {}), use: existing[0]?.use || "official" };
+        const given = String(formData.get("given") || "").trim();
+        name.given = given ? given.split(/\s+/) : [];
+        name.family = String(formData.get("family") || "").trim();
+        if (!name.given.length) delete name.given;
+        if (!name.family) delete name.family;
+        existing[0] = name;
+        resource.name = existing;
+      };
+
+      if (type === "Patient") {
+        setHumanName();
+        resource.gender = formData.get("gender") || undefined;
+        resource.birthDate = formData.get("birthDate") || undefined;
+        resource.active = formData.get("active") === "on";
+        const identifiers = resource.identifier || [];
+        const personnummer = String(formData.get("personnummer") || "").trim();
+        const personnummerIndex = identifiers.findIndex(item => item.system === PERSONNUMMER_SYSTEM);
+        const existingIdentifierIndex = personnummerIndex >= 0
+          ? personnummerIndex
+          : identifiers.findIndex(item => item.value);
+        if (personnummer) {
+          if (existingIdentifierIndex >= 0) {
+            identifiers[existingIdentifierIndex] = {
+              ...identifiers[existingIdentifierIndex],
+              system: PERSONNUMMER_SYSTEM,
+              value: personnummer
+            };
+          } else {
+            identifiers.push({ system: PERSONNUMMER_SYSTEM, value: personnummer });
+          }
+          resource.identifier = identifiers;
+        } else if (existingIdentifierIndex >= 0) {
+          identifiers.splice(existingIdentifierIndex, 1);
+          if (identifiers.length) resource.identifier = identifiers;
+          else delete resource.identifier;
+        }
+      } else if (type === "Organization") {
+        resource.name = String(formData.get("name") || "").trim();
+        resource.active = formData.get("active") === "on";
+        const parentReference = String(formData.get("partOf") || "").trim();
+        if (parentReference) {
+          const parentId = parentReference.match(/(?:^|\/)Organization\/([^/?#]+)/)?.[1];
+          const parent = organizationResources.find(item => item.resourceType === "Organization" && item.id === parentId);
+          resource.partOf = {
+            ...(resource.partOf || {}),
+            reference: parentReference,
+            ...(parent?.name ? { display: parent.name } : {})
+          };
+        } else {
+          delete resource.partOf;
+        }
+        const identifier = resource.identifier || [];
+        const value = String(formData.get("identifier") || "").trim();
+        if (value) {
+          if (identifier.length) identifier[0] = { ...identifier[0], value };
+          else identifier.push({ value });
+          resource.identifier = identifier;
+        } else if (identifier.length) {
+          identifier.shift();
+          resource.identifier = identifier;
+        }
+      } else if (type === "Practitioner") {
+        setHumanName();
+        resource.gender = formData.get("gender") || undefined;
+        resource.active = formData.get("active") === "on";
+        const telecom = (resource.telecom || []).filter(item => item.system !== "phone" && item.system !== "email");
+        for (const system of ["phone", "email"]) {
+          const value = String(formData.get(system) || "").trim();
+          if (value) telecom.push({ system, value });
+        }
+        resource.telecom = telecom;
+      } else {
+        resource.name = String(formData.get("name") || "").trim();
+        resource.status = formData.get("status");
+        const subject = String(formData.get("subject") || "").trim();
+        const organization = String(formData.get("managingOrganization") || "").trim();
+        if (subject) {
+          const patientId = subject.match(/(?:^|\/)Patient\/([^/?#]+)/)?.[1];
+          const patient = patientChoices.find(item => item.id === patientId);
+          resource.subject = {
+            ...(resource.subject || {}),
+            reference: subject,
+            ...(patient ? { display: displayName(patient) } : {})
+          };
+        }
+        else delete resource.subject;
+        if (organization) {
+          const organizationId = organization.match(/(?:^|\/)Organization\/([^/?#]+)/)?.[1];
+          const selectedOrganization = organizationResources.find(item => item.id === organizationId);
+          resource.managingOrganization = [{
+            reference: organization,
+            ...(selectedOrganization?.name ? { display: selectedOrganization.name } : {})
+          }];
+        }
+        else delete resource.managingOrganization;
+        applyCareTeamPeriod(resource, formData);
+        if (activeTab === "Team") {
+          const phone = String(formData.get("teamPhone") || "").trim();
+          const telecom = (resource.telecom || []).filter(point => point.system !== "phone");
+          if (phone) telecom.push({ system: "phone", value: phone });
+          if (telecom.length) resource.telecom = telecom;
+          else delete resource.telecom;
+        }
+        const selectedReferences = [...new Set(formData.getAll("participants").map(value => String(value).trim()).filter(Boolean))];
+        const existingParticipants = resource.participant || [];
+        const teamRoleCode = String(formData.get("teamRoleCode") || "");
+        resource.participant = selectedReferences.map(reference => {
+          const existingParticipant = existingParticipants.find(participant => participant.member?.reference === reference);
+          return removeCareManagerCodeFromParticipant(
+            existingParticipant
+              ? structuredClone(existingParticipant)
+              : { member: { reference } }
+          );
+        });
+        if (activeTab === "Team" && CARE_MANAGER_ROLE_CODES.some(([code]) => code === teamRoleCode)) {
+          setCareTeamCareManagerCode(resource, teamRoleCode);
+        }
+      }
+      for (const key of ["gender", "birthDate"]) {
+        if (resource[key] === undefined || resource[key] === "") delete resource[key];
+      }
+      return resource;
+    }
+
+    function buildPractitionerRoleWithPhone(role, phoneValue) {
+      const updatedRole = structuredClone(role);
+      const contacts = Array.isArray(updatedRole.contact)
+        ? updatedRole.contact
+        : updatedRole.contact ? [updatedRole.contact] : [];
+      let existingPhone;
+      for (const contact of contacts) {
+        const telecom = Array.isArray(contact.telecom) ? contact.telecom : contact.telecom ? [contact.telecom] : [];
+        existingPhone = existingPhone || telecom.find(point => point.system === "phone");
+      }
+      updatedRole.contact = contacts.map(contact => {
+        const telecom = Array.isArray(contact.telecom) ? contact.telecom : contact.telecom ? [contact.telecom] : [];
+        return {
+          ...contact,
+          telecom: telecom.filter(point => point.system !== "phone")
+        };
+      });
+      if (phoneValue) {
+        if (!updatedRole.contact.length) updatedRole.contact.push({});
+        const contact = updatedRole.contact[0];
+        contact.telecom = [
+          ...(contact.telecom || []),
+          { ...(existingPhone || {}), system: "phone", value: phoneValue }
+        ];
+      }
+      if (updatedRole.contact.length) updatedRole.contact = updatedRole.contact.filter(contact =>
+        contact.telecom?.length || contact.name || contact.purpose
+      );
+      else delete updatedRole.contact;
+      if (!updatedRole.contact?.length) delete updatedRole.contact;
+      return updatedRole;
+    }
+
+    function buildPractitionerRoleWithCode(role, code) {
+      const updatedRole = structuredClone(role);
+      const coding = {
+        system: CARE_MANAGER_ROLE_SYSTEM,
+        code,
+        display: CARE_MANAGER_ROLE_CODES.find(([value]) => value === code)[1]
+      };
+      const codeableConcepts = updatedRole.code ? [...updatedRole.code] : [];
+      const existingConceptIndex = codeableConcepts.findIndex(codeableConcept =>
+        codeableConcept.coding?.some(item => item.system === CARE_MANAGER_ROLE_SYSTEM)
+      );
+      if (existingConceptIndex >= 0) {
+        const existingConcept = codeableConcepts[existingConceptIndex];
+        codeableConcepts[existingConceptIndex] = {
+          ...existingConcept,
+          coding: existingConcept.coding.map(item => item.system === CARE_MANAGER_ROLE_SYSTEM ? coding : item)
+        };
+      } else if (codeableConcepts.length) {
+        const firstConcept = codeableConcepts[0];
+        codeableConcepts[0] = {
+          ...firstConcept,
+          coding: [...(firstConcept.coding || []), coding]
+        };
+      } else {
+        codeableConcepts.push({ coding: [coding] });
+      }
+      updatedRole.code = codeableConcepts;
+      return updatedRole;
+    }
+
+    function newCareManagerRole(practitionerReference) {
+      return {
+        resourceType: "PractitionerRole",
+        active: true,
+        practitioner: { reference: practitionerReference }
+      };
+    }
+
+    async function linkCareTeamParticipantsToRoles(careTeam) {
+      for (const participant of careTeam.participant || []) {
+        const reference = participant.member?.reference || "";
+        if (/(?:^|\/)PractitionerRole\/[^/?#]+$/.test(reference)) continue;
+        const practitionerId = reference.match(/(?:^|\/)Practitioner\/([^/?#]+)$/)?.[1];
+        if (!practitionerId) {
+          throw new Error(`Teammedlemmen "${reference || "utan referens"}" måste vara en Practitioner eller PractitionerRole.`);
+        }
+        const practitionerReference = `Practitioner/${practitionerId}`;
+        const role = await request("PractitionerRole", {
+          method: "POST",
+          body: JSON.stringify(newCareManagerRole(practitionerReference))
+        });
+        if (!role?.id) {
+          throw new Error(`FHIR-servern returnerade inget ID för PractitionerRole kopplad till ${practitionerReference}.`);
+        }
+        participant.member = {
+          ...participant.member,
+          reference: `PractitionerRole/${role.id}`
+        };
+      }
+    }
+
+    function buildPractitionerRoleWithOrganization(role, organizationReference) {
+      const updatedRole = structuredClone(role);
+      if (organizationReference) {
+        const organizationId = organizationReference.match(/(?:^|\/)Organization\/([^/?#]+)/)?.[1];
+        const organization = organizationResources.find(item => item.id === organizationId);
+        updatedRole.organization = {
+          ...(updatedRole.organization || {}),
+          reference: organizationReference,
+          ...(organization?.name ? { display: organization.name } : {})
+        };
+      } else {
+        delete updatedRole.organization;
+      }
+      return updatedRole;
+    }
+
+    async function handleRowAction(action, resource) {
+      if (action === "edit") {
+        openForm(resource);
+        return;
+      }
+      const name = displayName(resource);
+      const resourceLabel = resource.resourceType === "Practitioner" && activeTab === "Fast kontakt"
+        ? "fast kontakt"
+        : resources[resource.resourceType].label.toLowerCase();
+      if (!window.confirm(`Vill du ta bort ${resourceLabel}${name !== "—" ? ` "${name}"` : ""}?`)) return;
+      try {
+        await request(`${resource.resourceType}/${encodeURIComponent(resource.id)}`, { method: "DELETE" });
+        showNotice("Resursen har tagits bort.");
+        await loadResources();
+      } catch (error) {
+        showNotice(`Kunde inte ta bort resursen: ${error.message}`, true);
+      }
+    }
+
+    document.querySelectorAll(".tab").forEach(button => {
+      button.addEventListener("click", () => {
+        const resourceView = document.getElementById("resource-view");
+        const serverSettings = document.getElementById("server-settings");
+        const serverSettingsSelected = button.id === "tab-fhir-server";
+        resourceView.hidden = serverSettingsSelected;
+        serverSettings.hidden = !serverSettingsSelected;
+        if (serverSettingsSelected) {
+          document.getElementById("fhir-base-url").value = FHIR_BASE_URL;
+          document.getElementById("server-settings-status").hidden = true;
+        }
+        activeTab = button.id === "tab-patient" ? "Patient"
+          : button.id === "tab-organization" ? "Organization"
+            : button.id === "tab-practitioner" ? "Practitioner"
+            : button.id === "tab-team" ? "Team"
+              : serverSettingsSelected ? "FHIR-server" : "Fast kontakt";
+        document.querySelectorAll(".tab").forEach(tab => tab.setAttribute("aria-selected", String(tab === button)));
+        panel.setAttribute("aria-labelledby", button.id);
+        if (serverSettingsSelected) return;
+        document.getElementById("resource-hint").textContent = activeTab === "Fast kontakt"
+          ? "Fasta kontakter skapas som CareTeam med exakt en PractitionerRole."
+          : activeTab === "Team"
+            ? "Team hanteras som CareTeam-resurser."
+            : activeTab === "Organization"
+              ? "Organisationshierarkin visas indragen enligt FHIR-fältet partOf."
+              : activeTab === "Practitioner"
+                ? "Vårdpersonal hanteras som FHIR-resursen Practitioner."
+                : `FHIR-resurs: ${activeTab}.`;
+        const searchInput = document.getElementById("search-input");
+        searchInput.placeholder = "Sök på namn";
+        searchInput.setAttribute("aria-label", searchInput.placeholder);
+        document.getElementById("search-input").value = "";
+        loadResources();
+      });
+    });
+
+    document.getElementById("server-settings-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const status = document.getElementById("server-settings-status");
+      try {
+        const baseUrl = normalizeFhirBaseUrl(document.getElementById("fhir-base-url").value);
+        localStorage.setItem(FHIR_BASE_URL_STORAGE_KEY, baseUrl);
+        FHIR_BASE_URL = baseUrl;
+        document.getElementById("fhir-base-url").value = baseUrl;
+        status.textContent = `Bas-URL sparad: ${baseUrl}. Den används vid nästa anrop till FHIR-servern.`;
+        status.classList.remove("error");
+        status.hidden = false;
+      } catch (error) {
+        status.textContent = `Kunde inte spara bas-URL: ${error.message}`;
+        status.classList.add("error");
+        status.hidden = false;
+      }
+    });
+
+    document.getElementById("search-form").addEventListener("submit", event => {
+      event.preventDefault();
+      loadResources();
+    });
+    document.getElementById("refresh-button").addEventListener("click", loadResources);
+    document.getElementById("create-button").addEventListener("click", () => openForm());
+    document.getElementById("cancel-button").addEventListener("click", () => dialog.close());
+    document.getElementById("resource-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      if (activeTab === "Team" && !editingResource &&
+        new Set(formData.getAll("participants").map(String)).size < 2) {
+        const error = document.getElementById("team-participant-error");
+        error.hidden = false;
+        return;
+      }
+      validateCareTeamPeriod(form);
+      if (!form.reportValidity()) return;
+      const editingCareManagerTeam = activeTab === "Fast kontakt" &&
+        editingResource?.resourceType === "CareTeam";
+      const creatingCareManagerFromExistingPractitioner = activeTab === "Fast kontakt" &&
+        !editingResource && !formData.get("contact-kind");
+      const resource = creatingCareManagerFromExistingPractitioner || editingCareManagerTeam
+        ? null
+        : buildResource(formData);
+      const wasEditing = Boolean(editingResource);
+      const isCareManager = activeTab === "Fast kontakt" &&
+        (creatingCareManagerFromExistingPractitioner || resource?.resourceType === "Practitioner");
+      const selectedRoleCode = String(formData.get("careManagerRoleCode") || "1");
+      const selectedOrganizationReference = String(formData.get("careManagerOrganization") || "").trim();
+      try {
+        if (creatingCareManagerFromExistingPractitioner) {
+          const practitionerReference = String(formData.get("practitionerReference") || "");
+          const practitioner = practitionerChoices.find(item => `Practitioner/${item.id}` === practitionerReference);
+          if (!practitioner) throw new Error("Välj en befintlig vårdpersonal innan du sparar.");
+          const subjectReference = String(formData.get("careTeamSubject") || "").trim();
+          const patient = subjectReference
+            ? patientChoices.find(item => `Patient/${item.id}` === subjectReference)
+            : null;
+          if (subjectReference && !patient) throw new Error("Välj en patient från listan eller lämna fältet tomt.");
+          let role = buildPractitionerRoleWithOrganization(
+            newCareManagerRole(practitionerReference),
+            selectedOrganizationReference
+          );
+          role = buildPractitionerRoleWithPhone(
+            role,
+            String(formData.get("careManagerRolePhone") || "").trim()
+          );
+          const createdRole = await request("PractitionerRole", {
+            method: "POST",
+            body: JSON.stringify(role)
+          });
+          const careTeam = {
+            resourceType: "CareTeam",
+            status: "active",
+            name: displayName(practitioner),
+            category: [{
+              coding: [{
+                system: CARE_MANAGER_ROLE_SYSTEM,
+                code: selectedRoleCode,
+                display: CARE_MANAGER_ROLE_CODES.find(([code]) => code === selectedRoleCode)?.[1] || selectedRoleCode
+              }]
+            }],
+            participant: [{
+              member: { reference: `PractitionerRole/${createdRole.id}` }
+            }]
+          };
+          applyCareTeamPeriod(careTeam, formData);
+          if (patient) {
+            careTeam.subject = {
+              reference: subjectReference,
+              display: displayName(patient)
+            };
+          }
+          if (selectedOrganizationReference) {
+            careTeam.managingOrganization = [{ reference: selectedOrganizationReference }];
+          }
+          await request("CareTeam", {
+            method: "POST",
+            body: JSON.stringify(careTeam)
+          });
+        } else if (editingCareManagerTeam) {
+          const currentMemberReference = editingResource.participant?.[0]?.member?.reference || "";
+          const currentRoleId = currentMemberReference.match(/(?:^|\/)PractitionerRole\/([^/?#]+)/)?.[1];
+          if (currentRoleId && !editingCareTeamRole) {
+            throw new Error("Den befintliga PractitionerRole-resursen kunde inte läsas. Uppdateringen avbröts.");
+          }
+          const practitionerReference = String(formData.get("practitionerReference") || "").trim();
+          const practitioner = practitionerChoices.find(item => `Practitioner/${item.id}` === practitionerReference);
+          if (!practitioner) throw new Error("Välj vårdpersonal innan du sparar.");
+          const subjectReference = String(formData.get("subject") || "").trim();
+          const patient = subjectReference
+            ? patientChoices.find(item => `Patient/${item.id}` === subjectReference)
+            : null;
+          if (subjectReference && !patient) throw new Error("Välj en patient från listan eller lämna fältet tomt.");
+          const organizationReference = String(formData.get("managingOrganization") || "").trim();
+          const organization = organizationResources.find(item =>
+            `Organization/${item.id}` === organizationReference
+          );
+          const teamRoleCode = String(formData.get("careManagerRoleCode") || "");
+          const teamRole = CARE_MANAGER_ROLE_CODES.find(([code]) => code === teamRoleCode);
+          if (!teamRole) throw new Error("Välj en giltig typ av fast kontakt.");
+
+          let role = editingCareTeamRole
+            ? structuredClone(editingCareTeamRole)
+            : newCareManagerRole(practitionerReference);
+          role.practitioner = { reference: practitionerReference };
+          role = buildPractitionerRoleWithOrganization(role, organizationReference);
+          role = buildPractitionerRoleWithPhone(
+            role,
+            String(formData.get("careManagerRolePhone") || "").trim()
+          );
+          const existingRoleId = role.id;
+          const savedRole = await request(
+            existingRoleId ? `PractitionerRole/${encodeURIComponent(existingRoleId)}` : "PractitionerRole",
+            { method: existingRoleId ? "PUT" : "POST", body: JSON.stringify(role) }
+          );
+          const roleId = existingRoleId || savedRole?.id;
+          if (!roleId) throw new Error("FHIR-servern returnerade inget ID för PractitionerRole.");
+
+          const careTeam = structuredClone(editingResource);
+          careTeam.name = String(formData.get("name") || "").trim();
+          careTeam.status = formData.get("status");
+          applyCareTeamPeriod(careTeam, formData);
+          if (patient) {
+            careTeam.subject = {
+              ...(careTeam.subject || {}),
+              reference: subjectReference,
+              display: displayName(patient)
+            };
+          } else {
+            delete careTeam.subject;
+          }
+          if (organizationReference) {
+            careTeam.managingOrganization = [{
+              reference: organizationReference,
+              ...(organization?.name ? { display: organization.name } : {})
+            }];
+          } else {
+            delete careTeam.managingOrganization;
+          }
+          const participant = structuredClone(careTeam.participant?.[0] || {});
+          participant.member = {
+            ...(participant.member || {}),
+            reference: `PractitionerRole/${roleId}`
+          };
+          removeCareManagerCodeFromParticipant(participant);
+          careTeam.participant = [participant];
+          setCareTeamCareManagerCode(careTeam, teamRoleCode);
+          await request(`CareTeam/${encodeURIComponent(careTeam.id)}`, {
+            method: "PUT",
+            body: JSON.stringify(careTeam)
+          });
+        } else {
+          if (resource.resourceType === "CareTeam") {
+            await linkCareTeamParticipantsToRoles(resource);
+          }
+          const path = editingResource
+            ? `${resource.resourceType}/${encodeURIComponent(resource.id)}`
+            : resource.resourceType;
+          await request(path, {
+            method: editingResource ? "PUT" : "POST",
+            body: JSON.stringify(resource)
+          });
+        }
+        if (isCareManager && editingResource) {
+          let updatedRole = false;
+          for (const originalRole of editingPractitionerRoles) {
+            let role = structuredClone(originalRole);
+            const phone = String(formData.get(`rolePhone-${role.id}`) || "").trim();
+            role = buildPractitionerRoleWithPhone(role, phone);
+            if (editingCareManagerRole?.id === role.id) {
+              role = buildPractitionerRoleWithCode(role, selectedRoleCode);
+              role = buildPractitionerRoleWithOrganization(role, selectedOrganizationReference);
+              updatedRole = true;
+            }
+            await request(`PractitionerRole/${encodeURIComponent(role.id)}`, {
+              method: "PUT",
+              body: JSON.stringify(role)
+            });
+          }
+          if (!updatedRole) {
+            const role = buildPractitionerRoleWithOrganization(
+              newCareManagerRole(`Practitioner/${resource.id}`),
+              selectedOrganizationReference
+            );
+            await request("PractitionerRole", {
+              method: "POST",
+              body: JSON.stringify(role)
+            });
+          }
+        }
+        dialog.close();
+        showNotice(wasEditing ? "Resursen har uppdaterats." : "Resursen har skapats.");
+        editingResource = null;
+        editingPractitionerRoles = [];
+        await loadResources();
+      } catch (error) {
+        showNotice(`Kunde inte spara resursen: ${error.message}`, true);
+      }
+    });
+
+    document.getElementById("resource-hint").textContent = "FHIR-resurs: Patient.";
+    loadResources();
+  </script>
+</body>
+</html>
